@@ -15,6 +15,7 @@ router.put("/user-update", authVerificationUser, userController.update);
 
 //Blog Routes
 router.post("/create-blog", authVerificationUser, blogController.createBlog);
-router.get("/blogs", blogController.getAllBlogs);
-router.get("/single-blog/:id", blogController.getBlogById);
+router.get("/blogs", authVerificationUser, blogController.getAllBlogs);
+router.get("/single-blog/:id", authVerificationUser, blogController.getBlogById);
+router.put("/update-blog/:id", authVerificationUser, blogController.updateBlog);
 module.exports= router;
