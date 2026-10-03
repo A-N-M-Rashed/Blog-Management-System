@@ -56,3 +56,32 @@ exports.getAllBlogs = async (req, res) => {
         });
     }
 };
+
+// Read Single Blog
+exports.getBlogById = async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        const blog = await blogModel.findById(id).populate("user_id", "name email");
+
+        if (!blog) {
+            return res.status(404).json({
+                success: false,
+                message: "Blog not found",
+            });
+        }
+
+        return res.status(200).json({
+            success: true,
+            message: "Blog fetched successfully",
+            data: blog,
+        });
+
+    } catch (error) {
+        return res.status(500).json({
+            success: false,
+            error: error.toString(),
+            message: "Something went wrong.",
+        });
+    }
+};
