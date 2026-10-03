@@ -116,3 +116,21 @@ exports.userVerification= async (req, res)=>{
             });        
     }
 }
+
+//logout
+exports.logout= async (req, res)=>{
+    try{
+        res.clearCookie("u__token", options);
+        res.status(200).json({
+            success: true,
+            message: "Logout successful"
+        })
+    }catch(error){
+        res.status(500)
+            .json({
+                success: false,
+                error: error.toString(),
+                message: "Something went wrong."
+            });        
+    }
+}
