@@ -18,4 +18,5 @@ router.post("/create-blog", authVerificationUser, blogController.createBlog);
 router.get("/blogs", authVerificationUser, blogController.getAllBlogs);
 router.get("/single-blog/:id", authVerificationUser, blogController.getBlogById);
 router.put("/update-blog/:id", authVerificationUser, blogController.updateBlog);
+router.delete("/delete-blog/:id", authVerificationUser, blogController.deleteBlog);
 module.exports= router;

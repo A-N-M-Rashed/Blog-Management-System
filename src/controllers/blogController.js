@@ -129,3 +129,41 @@ exports.updateBlog = async (req, res) => {
         });
     }
 };
+
+// Delete Blog
+exports.deleteBlog = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const loggedInUserId = req.headers._id;
+
+        const blog = await blogModel.findById(id);
+
+        if (!blog) {
+            return res.status(404).json({
+                success: false,
+                message: "Blog not found",
+            });
+        }
+
+        if (blog.user_id.toString() !== loggedInUserId) {
+            return res.status(403).json({
+                success: false,
+                message: "Unauthorized: You can only delete your own blogs",
+            });
+        }
+
+        await blogModel.findByIdAndDelete(id);
+
+        return res.status(200).json({
+            success: true,
+            message: "Blog deleted successfully",
+        });
+
+    } catch (error) {
+        return res.status(500).json({
+            success: false,
+            error: error.toString(),
+            message: "Something went wrong.",
+        });
+    }
+};
