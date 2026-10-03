@@ -19,7 +19,6 @@ const upload = multer({
     },
 }).single("blogImage"); 
 
-// Wrap it with your custom error handling
 const fileUploadMiddleware = (req, res, next) => {
     upload(req, res, (err) => {
         if (err) {
