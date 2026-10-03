@@ -10,6 +10,7 @@ exports.DecodeToken= (token)=>{
     try{
         let key= process.env.JWT_KEY;
         let decoded= jwt.verify(token, key);
+        return decoded;
     }catch(error){
         return null;
     }
