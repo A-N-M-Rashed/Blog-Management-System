@@ -73,27 +73,27 @@ exports.login = async (req, res) => {
 }
 
 //get-logged in Users
-exports.user= async (req, res)=>{
-    try{
-       let email = req.headers.email;
-       let matchStage= {
-        $match: {email},
-       };
+exports.user = async (req, res) => {
+    try {
+        let email = req.headers.email;
+        let matchStage = {
+            $match: { email },
+        };
 
-       let project= {
-        $project : {
-            email: 1,
-            name: 1,
-            _id: 0
-        } 
-       }
+        let project = {
+            $project: {
+                email: 1,
+                name: 1,
+                _id: 0
+            }
+        }
 
-       let data= await userModel.aggregate([matchStage, project]);
-       res.status(200).json({
-        success: true,
-        data: data[0],
-       })
-    }catch (error) {
+        let data = await userModel.aggregate([matchStage, project]);
+        res.status(200).json({
+            success: true,
+            data: data[0],
+        })
+    } catch (error) {
         res.status(500)
             .json({
                 success: false,
@@ -104,33 +104,99 @@ exports.user= async (req, res)=>{
 }
 
 //user verify
-exports.userVerification= async (req, res)=>{
-    try{
-        res.status(200).json({success: true});
-    }catch(error){
+exports.userVerification = async (req, res) => {
+    try {
+        res.status(200).json({ success: true });
+    } catch (error) {
         res.status(500)
             .json({
                 success: false,
                 error: error.toString(),
                 message: "Something went wrong."
-            });        
+            });
     }
 }
 
 //logout
-exports.logout= async (req, res)=>{
-    try{
+exports.logout = async (req, res) => {
+    try {
         res.clearCookie("u__token", options);
         res.status(200).json({
             success: true,
             message: "Logout successful"
         })
-    }catch(error){
+    } catch (error) {
         res.status(500)
             .json({
                 success: false,
                 error: error.toString(),
                 message: "Something went wrong."
-            });        
+            });
+    }
+}
+
+//user profile update
+exports.update = async (req, res) => {
+    try {
+        let email = req.headers.email;
+        let _id = req.headers._id;
+        console.log("DEBUG - Email from header:", email);
+        console.log("DEBUG - ID from header:", _id);
+        const {
+            name,
+            password,
+            phoneNumber
+        } = req.body;
+
+        let updatedData = {
+            name,
+            email,
+            password,
+            phoneNumber
+        };
+
+        const user = await userModel.findOne({ email, _id });
+        if (!user)
+            return res.status(200).json({
+                success: false,
+                message: "Invalid email."
+            })
+        if (password) {
+            const hashedPassword = await bcrypt.hash(password, 10);
+            updatedData.password = hashedPassword;
+        }
+        const isMatch = await bcrypt.compare(password, updatedData.password)
+        if (!isMatch)
+            return res.status(200).json({
+                success: false,
+                message: "Invalid password"
+            })
+        if (isMatch) {
+            //update user
+            const user = await userModel.findByIdAndUpdate(_id, updatedData, {
+                new: true,
+            });
+            let token = EncodeToken(user?.email, user?._id.toString());
+
+            //set Cookie
+            res.cookie("u__token", token, options);
+            res.status(200).json({
+                success: true,
+                message: "Updated data successfully",
+                user: {
+                    id: user._id,
+                    email: user.email,
+                },
+                token: token,
+
+            });
+        }
+    } catch (error) {
+        res.status(500)
+            .json({
+                success: false,
+                error: error.toString(),
+                message: "Something went wrong."
+            });
     }
 }
