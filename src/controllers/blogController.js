@@ -4,9 +4,10 @@ const blogModel = require("../models/blogModel");
 exports.createBlog = async (req, res) => {
     try {
         const {
-            title, authorName, content, tags, blogImage,
+            title, authorName, content, tags,
         } = req.body;
         const user_id = req.headers._id;
+        const blogImage = req.file ? req.file.filename : null;
         let data = await blogModel.create({
             title,
             authorName,
