@@ -33,3 +33,26 @@ exports.createBlog = async (req, res) => {
             });
     }
 }
+
+//Read All Blogs
+exports.getAllBlogs = async (req, res) => {
+    try {
+        const blogs = await blogModel.find()
+            .populate("user_id", "name email") 
+            .sort({ createdAt: -1 });
+
+        return res.status(200).json({
+            success: true,
+            message: "Blogs fetched successfully",
+            count: blogs.length,
+            data: blogs,
+        });
+
+    } catch (error) {
+        return res.status(500).json({
+            success: false,
+            error: error.toString(),
+            message: "Something went wrong.",
+        });
+    }
+};
